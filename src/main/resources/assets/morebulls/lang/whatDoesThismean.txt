@@ -1,0 +1,200 @@
+{
+
+  //Needed, but not known why.
+  "parent": "item/generated",
+
+  // Go to textures folder
+  "textures": {
+   //Inside morebulls folder we are looking for item(folder) and get the citine.png file.
+    "layer0": "morebulls:item/citrine"
+  }
+}
+
+//TO CREATE A MOB:
+
+    THIS IS NOT IN ORDER BUT YOU WILL NEED GECKO LIBRARY DEPENDENCY!!!!
+
+
+
+    CLASSES:
+
+    STEP 1!
+    RENDER: class to render the mod.:
+
+    //Render the bull
+        public bullRender(EntityRendererProvider.Context renderManager) {
+            super(renderManager, new bullModel());
+            this.shadowRadius = 0.5f;
+        }
+
+        //Get the texture location.
+        @Override
+        public ResourceLocation getTextureLocation(BullEntity instance) {
+            return new ResourceLocation(morebullsMain.MOD_ID, "textures/entity/adult_bull/adult_bull.png");
+        }
+
+        //What type
+        @Override
+        public RenderType getRenderType(BullEntity animatable, float partialTicks, PoseStack stack,
+                                        MultiBufferSource renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn,
+                                        ResourceLocation textureLocation){
+            stack.scale(1.0F, 1.0F, 1.0F);
+            return super.getRenderType(animatable, partialTicks, stack,
+                    renderTypeBuffer,vertexBuilder, packedLightIn, textureLocation);
+        }
+
+
+
+    STEP 2!
+    MODEL:  class for building the model.:
+
+    //Retrieve Bull model from resources folder.
+        @Override
+        public ResourceLocation getModelLocation(BullEntity object) {
+            return new ResourceLocation(morebullsMain.MOD_ID, "geo/adult_bull.geo.json");
+        }
+
+        //Retrieve bull textures(.png file)
+        @Override
+        public ResourceLocation getTextureLocation(BullEntity object) {
+            return new ResourceLocation(morebullsMain.MOD_ID, "textures/entity/adult_bull/adult_bull.png");
+        }
+
+        //Get animations from bull
+        @Override
+        public ResourceLocation getAnimationFileLocation(BullEntity animatable) {
+            //Bull animation.
+            return new ResourceLocation(morebullsMain.MOD_ID, "animations/adult_bull.animation.json");
+
+        }
+
+    STEP 3!
+    Register the mob into the eventbus in order to compile during runtime.
+    You can have many mods in the same entity class. you would only need 1 method for entities and make many.
+
+        //Entity: (create many entities from here.)
+        public static final DeferredRegister<EntityType<?>> ENTITIES =
+                DeferredRegister.create(ForgeRegistries.ENTITIES, MainBuild.MOD_ID);
+
+        //Entity Bull (list the bull specifically) // Other custom mods would follow after.
+        public static final RegistryObject<EntityType<BullEntity>> ADULT_BULL = ENTITIES.register("adult bull",
+                () -> EntityType.Builder.of(BullEntity::new, MobCategory.CREATURE).sized(0.8f, 0.6f)
+                        .build(new ResourceLocation(MainBuild.MOD_ID, "adult bull").toString()));
+
+
+    STEP 4!
+    MAKE A BULL ENTITY CLASS WHICH GIVE IT NECCESSARY ATTRIBUTES.
+
+    public class BullEntity extends Animal implements IAnimatable {
+
+        //Needed for animations.
+        private AnimationFactory factory = new AnimationFactory(this);
+
+
+        //Bull constructor.
+        public BullEntity(EntityType<? extends Animal> entityType, Level level){
+            super(entityType, level);
+        }
+
+
+        //Bull Goals.
+        @Override
+        protected void registerGoals(){
+            super.registerGoals();
+            this.goalSelector.addGoal(1,new FloatGoal(this));
+            this.goalSelector.addGoal(2, new RandomLookAroundGoal(this));
+            this.goalSelector.addGoal(3, new PanicGoal(this, 1.25D));
+            this.goalSelector.addGoal(4, new FollowParentGoal(this, 1.25D));
+            this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0D));
+            this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
+            this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 8.0f));
+        }
+
+        //Attributes bull can have.
+        public static AttributeSupplier setAttributes(){
+
+            //Health and movementspeed.
+            return Animal.createMobAttributes()
+                    .add(Attributes.MAX_HEALTH, 14.0D)
+                    .add(Attributes.MOVEMENT_SPEED, 0.3f)
+                    .add(Attributes.ATTACK_SPEED, 2.0f)
+                    .add(Attributes.ATTACK_DAMAGE, 3.0f).build();
+        }
+
+        //Making bull breedable.
+        @Override
+        public  AgeableMob getBreedOffspring(ServerLevel level, AgeableMob parent){
+            return ModEntityTypes.ADULT_BULL.get().create(level);
+        }
+
+
+        //Animal animations from resources folder.
+        private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event){
+            if(event.isMoving()){
+                event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.adult_bull.walk", true));
+                return PlayState.CONTINUE;
+            }
+            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.adult_bull.idle", true));
+            return PlayState.CONTINUE;
+        }
+
+        //add Animations to controller.
+        @Override
+        public void registerControllers(AnimationData data) {
+
+            data.addAnimationController(new AnimationController(this, "controller",
+                    0,this::predicate));
+        }
+
+
+        //returns animations from object above for animations.
+        @Override
+        public AnimationFactory getFactory() {
+            return this.factory;
+        }
+    }
+
+    STEP 5:
+    MOD EVENT BUS CLASS:
+    @Mod.EventBusSubscriber(modid = morebullsMain.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    public class ModEventBusEvents {
+
+
+        //Needed for bull entity attributes.
+        @SubscribeEvent
+        public static void entityAttributesEvent(EntityAttributeCreationEvent event){
+            //event.put(ModEntityTypes.ADULT_BULL.get(), BullEntity.setAttributes());
+            event.put(ModEntityTypes.ADULT_BULL.get(), BullEntity.setAttributes());
+        }
+        @SubscribeEvent
+        public static void clientSetup(final FMLClientSetupEvent event){
+            //Bull
+            EntityRenderers.register(ModEntityTypes.ADULT_BULL.get(), bullRender::new);
+        }
+
+    }
+
+    STEP 6:
+    MAIN CLASS FOR REGISTERING THE ENTITIES, OR ANYTHING REALLY SUCH AS ITEMS, BLOCKS.
+
+    public morebullsMain()
+        {
+            //Mod Loading event
+            IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+
+            ModItem.ITEMS.register(eventBus); //Items tab.
+            ModEntityTypes.ENTITIES.register(eventBus); //Entities
+
+            GeckoLib.initialize();
+
+            eventBus.addListener(this::setup);//set first.
+            //eventBus.addListener(this::clientSetup); //client setup
+
+            //GeckoLib.initialize();
+            // Register ourselves for server and other game events we are interested in
+            MinecraftForge.EVENT_BUS.register(this);
+        }
+
+    STEP 7:
+    CREATE FOLDERS TO HOLD ANIMATIONS, TEXTURES(.png), and a geo.json file to build the bull.
