@@ -1,6 +1,6 @@
 package net.jeremyWilson.morebulls.entity;
 
-import net.jeremyWilson.morebulls.morebullsMain;
+import net.jeremyWilson.morebulls.MaxsMod;
 import net.jeremyWilson.morebulls.entity.custom.BullEntity;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -14,14 +14,12 @@ public final class ModEntityTypes {
 
     //Entity:
     public static final DeferredRegister<EntityType<?>> ENTITIES =
-            DeferredRegister.create(ForgeRegistries.ENTITIES, morebullsMain.MOD_ID);
+            DeferredRegister.create(ForgeRegistries.ENTITIES, MaxsMod.MOD_ID);
 
     //Entity: Bull
     public static final RegistryObject<EntityType<BullEntity>> ADULT_BULL = ENTITIES.register("adult_bull",
             () -> EntityType.Builder.of(BullEntity::new, MobCategory.CREATURE).sized(1.8f, 1.8f)
-                    .build(new ResourceLocation(morebullsMain.MOD_ID, "adult_bull").toString()));
-
-
+                    .build(new ResourceLocation(MaxsMod.MOD_ID, "adult_bull").toString()));
 
 
     //register bull Entities.

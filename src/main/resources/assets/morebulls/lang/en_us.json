@@ -1,9 +1,10 @@
 {
-  "item.morebulls.citrine": "Citrine",
 
-  "item.morebulls.raw_citrine": "Raw Citrine",
+  "item.morebulls.adult_bull_spawn_egg": "Bull Spawn Egg",
 
-  "item.morebulls.adult_bull_spawn_egg": "Bull Spawn Egg"
+  "item.morebulls.bullmeat": "Raw Bull Meat",
+
+  "item.morebulls.cooked_bullmeat": "Cooked Bull Meat"
 
 }
 

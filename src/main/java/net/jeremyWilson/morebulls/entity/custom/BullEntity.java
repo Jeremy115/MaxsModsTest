@@ -1,7 +1,10 @@
 package net.jeremyWilson.morebulls.entity.custom;
 
 import net.jeremyWilson.morebulls.entity.ModEntityTypes;
-import net.jeremyWilson.morebulls.morebullsMain;
+import net.jeremyWilson.morebulls.MaxsMod;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -14,6 +17,7 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
@@ -26,10 +30,19 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 
 public class BullEntity extends Animal implements IAnimatable {
 
-    //Needed for animations.
-    private static final ResourceLocation LOOT_TABLE = new ResourceLocation(morebullsMain.MOD_ID,
-            "entities/bulldrop" );
+
+    //Variable(geckoLibrary)
     private AnimationFactory factory = new AnimationFactory(this);
+
+    //Needed for animations.
+    private static final ResourceLocation LOOT_TABLE = new ResourceLocation(MaxsMod.MOD_ID,
+            "entities/bulldrop" );
+
+
+    //breaking blocks
+    public static final EntityDataAccessor<Boolean> BREAKING_BLOCKS =
+            SynchedEntityData.defineId(BullEntity.class, EntityDataSerializers.BOOLEAN);
+
 
 
     //Bull constructor.
@@ -49,6 +62,7 @@ public class BullEntity extends Animal implements IAnimatable {
         this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8.0f));
         this.goalSelector.addGoal(7, new BreedGoal(this, 1.0D));
+        this.goalSelector.addGoal(8, new TemptGoal(this, 1.25D, Ingredient.of(Items.WHEAT), false));
 
 
     }
@@ -66,7 +80,7 @@ public class BullEntity extends Animal implements IAnimatable {
 
     //Returns offSpring of the bull .
     @Override
-    public  AgeableMob getBreedOffspring(ServerLevel level, AgeableMob parent){
+    public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob parent){
 
         return ModEntityTypes.ADULT_BULL.get().create(level);
         //return EntityType.COW.create(level);
@@ -108,12 +122,14 @@ public class BullEntity extends Animal implements IAnimatable {
         return InteractionResult.FAIL;
     }
 
+
+    //Required for mob drops. Currently, it matches that of a cow. Dropping beef and item.
     @Override
     protected ResourceLocation getDefaultLootTable(){
         return LOOT_TABLE;
     }
 
-    //Bull can be leached by player.
+    //Bull can be leashed by player.
     public boolean canBeLeashed(Player player){
         return true;
     }
@@ -123,7 +139,5 @@ public class BullEntity extends Animal implements IAnimatable {
     public AnimationFactory getFactory() {
         return this.factory;
     }
-
-
 
 }

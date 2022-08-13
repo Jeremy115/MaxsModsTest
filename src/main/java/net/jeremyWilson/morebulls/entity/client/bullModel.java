@@ -1,6 +1,6 @@
 package net.jeremyWilson.morebulls.entity.client;
 
-import net.jeremyWilson.morebulls.morebullsMain;
+import net.jeremyWilson.morebulls.MaxsMod;
 import net.jeremyWilson.morebulls.entity.custom.BullEntity;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
@@ -13,20 +13,20 @@ public class bullModel extends AnimatedGeoModel<BullEntity> {
     //Retrieve Bull model from resources folder.
     @Override
     public ResourceLocation getModelLocation(BullEntity object) {
-        return new ResourceLocation(morebullsMain.MOD_ID, "geo/adult_bull.geo.json");
+        return new ResourceLocation(MaxsMod.MOD_ID, "geo/adult_bull.geo.json");
     }
 
     //Retrieve bull textures(.png file)
     @Override
     public ResourceLocation getTextureLocation(BullEntity object) {
-        return new ResourceLocation(morebullsMain.MOD_ID, "textures/entity/adult_bull/adult_bull.png");
+        return new ResourceLocation(MaxsMod.MOD_ID, "textures/entity/adult_bull/adult_bull.png");
     }
 
     //Get animations from bull
     @Override
     public ResourceLocation getAnimationFileLocation(BullEntity animatable) {
         //Bull animation.
-        return new ResourceLocation(morebullsMain.MOD_ID, "animations/adult_bull.animation.json");
+        return new ResourceLocation(MaxsMod.MOD_ID, "animations/adult_bull.animation.json");
 
     }
 

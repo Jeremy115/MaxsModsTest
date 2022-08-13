@@ -3,7 +3,7 @@ package net.jeremyWilson.morebulls.entity.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.jeremyWilson.morebulls.morebullsMain;
+import net.jeremyWilson.morebulls.MaxsMod;
 import net.jeremyWilson.morebulls.entity.custom.BullEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -23,7 +23,7 @@ public class bullRender extends GeoEntityRenderer<BullEntity> {
     //Get the texture location.
     @Override
     public ResourceLocation getTextureLocation(BullEntity instance) {
-        return new ResourceLocation(morebullsMain.MOD_ID, "textures/entity/adult_bull/adult_bull.png");
+        return new ResourceLocation(MaxsMod.MOD_ID, "textures/entity/adult_bull/adult_bull.png");
     }
 
     //What type

@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smoking",
+  "ingredient": {
+    "item": "morebulls:bullmeat"
+  },
+  "result": "morebulls:cooked_bullmeat",
+  "experience": 0.35,
+  "cookingtime": 100
+}

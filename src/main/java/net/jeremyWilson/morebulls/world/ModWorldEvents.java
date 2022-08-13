@@ -1,13 +1,13 @@
 package net.jeremyWilson.morebulls.world;
 
 
-import net.jeremyWilson.morebulls.morebullsMain;
+import net.jeremyWilson.morebulls.MaxsMod;
 import net.jeremyWilson.morebulls.world.gen.ModEntityGeneration;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = morebullsMain.MOD_ID)
+@Mod.EventBusSubscriber(modid = MaxsMod.MOD_ID)
 public class ModWorldEvents {
 
     @SubscribeEvent

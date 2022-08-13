@@ -8,8 +8,9 @@ public class ModCreativeModeTab {
     public static final CreativeModeTab CREATIVE_TAB = new CreativeModeTab("creative") {
         @Override
         public ItemStack makeIcon() {
-            return new ItemStack(ModItem.CITRINE.get());
+            return new ItemStack(ModItem.BULL_MEAT.get());
         }
+
     };
 
 }
