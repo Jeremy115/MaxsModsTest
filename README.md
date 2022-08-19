@@ -1,5 +1,4 @@
 # MaxsMods
-Making mods for minecraft. 
 
 A mod that adds upon minecraft. 
 
