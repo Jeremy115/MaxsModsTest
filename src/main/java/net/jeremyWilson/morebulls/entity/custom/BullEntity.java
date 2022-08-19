@@ -2,6 +2,7 @@ package net.jeremyWilson.morebulls.entity.custom;
 
 import net.jeremyWilson.morebulls.entity.ModEntityTypes;
 import net.jeremyWilson.morebulls.MaxsMod;
+import net.jeremyWilson.morebulls.event.bullEntityBreaksRedBlocks;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -19,6 +20,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -39,11 +42,6 @@ public class BullEntity extends Animal implements IAnimatable {
             "entities/bulldrop" );
 
 
-    //breaking blocks
-    public static final EntityDataAccessor<Boolean> BREAKING_BLOCKS =
-            SynchedEntityData.defineId(BullEntity.class, EntityDataSerializers.BOOLEAN);
-
-
 
     //Bull constructor.
     public BullEntity(EntityType<? extends Animal> entityType, Level level){
@@ -55,15 +53,15 @@ public class BullEntity extends Animal implements IAnimatable {
     @Override
     protected void registerGoals(){
         super.registerGoals();
-        this.goalSelector.addGoal(1, new FloatGoal(this));
-        this.goalSelector.addGoal(2, new RandomLookAroundGoal(this));
-        this.goalSelector.addGoal(3, new PanicGoal(this, 1.25D));
-        this.goalSelector.addGoal(4, new FollowParentGoal(this, 1.25D));
-        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0D));
-        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8.0f));
-        this.goalSelector.addGoal(7, new BreedGoal(this, 1.0D));
-        this.goalSelector.addGoal(8, new TemptGoal(this, 1.25D, Ingredient.of(Items.WHEAT), false));
-
+        this.goalSelector.addGoal(1, new bullEntityBreaksRedBlocks(Blocks.REDSTONE_BLOCK, this, 1.0D, 12));
+        this.goalSelector.addGoal(2, new FloatGoal(this));
+        this.goalSelector.addGoal(3, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(4, new PanicGoal(this, 1.25D));
+        this.goalSelector.addGoal(5, new FollowParentGoal(this, 1.25D));
+        this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 1.0D));
+        this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 8.0f));
+        this.goalSelector.addGoal(8, new BreedGoal(this, 1.0D));
+        this.goalSelector.addGoal(9, new TemptGoal(this, 1.25D, Ingredient.of(Items.WHEAT), false));
 
     }
 
@@ -134,6 +132,9 @@ public class BullEntity extends Animal implements IAnimatable {
         return true;
     }
 
+
+
+
     //returns animations from object above for animations.
     @Override
     public AnimationFactory getFactory() {
@@ -141,3 +142,4 @@ public class BullEntity extends Animal implements IAnimatable {
     }
 
 }
+
