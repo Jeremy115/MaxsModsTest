@@ -133,8 +133,6 @@ public class BullEntity extends Animal implements IAnimatable {
     }
 
 
-
-
     //returns animations from object above for animations.
     @Override
     public AnimationFactory getFactory() {
