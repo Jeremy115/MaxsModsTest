@@ -1,11 +1,8 @@
 # MaxsMods
-Making mods for minecraft. 
 
+A mod that adds upon minecraft. 
 
-Thats right, this mod adds more entities and extra food for now. 
-
-Also, I need to make the food textures 16 x 16, for now they are broken. 
-
+This mod for now only adds a bull entity into minecraft, but in the future I plan to add more animals, ores, blocks, and utilities to add onto the vanilla experience. 
 
 Dependencies: GeckoLibrary 
 
