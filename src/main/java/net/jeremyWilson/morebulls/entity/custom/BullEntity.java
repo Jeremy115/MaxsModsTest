@@ -2,12 +2,10 @@ package net.jeremyWilson.morebulls.entity.custom;
 
 import net.jeremyWilson.morebulls.entity.ModEntityTypes;
 import net.jeremyWilson.morebulls.MaxsMod;
-import net.jeremyWilson.morebulls.event.bullEntityBreaksRedBlocks;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.*;
@@ -22,6 +20,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -29,10 +28,19 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class BullEntity extends Animal implements IAnimatable {
 
+
+
+    // Add a constructor that takes a World object as an argument
 
     //Variable(geckoLibrary)
     private AnimationFactory factory = new AnimationFactory(this);
@@ -53,7 +61,7 @@ public class BullEntity extends Animal implements IAnimatable {
     @Override
     protected void registerGoals(){
         super.registerGoals();
-        this.goalSelector.addGoal(1, new bullEntityBreaksRedBlocks(Blocks.REDSTONE_BLOCK, this, 1.0D, 12));
+        //this.goalSelector.addGoal(1, new bullEntityBreaksRedBlocks(Blocks.REDSTONE_BLOCK, this, 1.0D, 12));
         this.goalSelector.addGoal(2, new FloatGoal(this));
         this.goalSelector.addGoal(3, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(4, new PanicGoal(this, 1.25D));
@@ -138,6 +146,109 @@ public class BullEntity extends Animal implements IAnimatable {
     public AnimationFactory getFactory() {
         return this.factory;
     }
+
+
+
+    private BlockPos targetPos;
+    private BlockPos direction;
+
+    private BlockPos findNearestBlock(BlockPos startPos, Block... blocks) {
+
+        // Get the entity's current position
+        double x = this.getX();
+        double y = this.getY();
+        double z = this.getZ();
+        BlockPos entityPos = new BlockPos(x, y, z);
+
+        // Create a list of the target blocks
+        List<Block> targetBlocks = Arrays.asList(blocks);
+
+        // Set the minimum distance to the maximum possible value
+        double minDistance = Double.MAX_VALUE;
+        BlockPos nearestPos = null;
+
+        // Get the blocks within a radius of 16 blocks from the start position
+        BlockPos minPos = new BlockPos(startPos.getX() - 16, startPos.getY() - 16, startPos.getZ() - 16);
+        BlockPos maxPos = new BlockPos(startPos.getX() + 16, startPos.getY() + 16, startPos.getZ() + 16);
+        List<BlockPos> posList = new ArrayList<>();
+
+        for (int x2 = minPos.getX(); x2 <= maxPos.getX(); x2++) {
+            for (int y2 = minPos.getY(); y2 <= maxPos.getY(); y2++) {
+                for (int z2 = minPos.getZ(); z2 <= maxPos.getZ(); z2++) {
+                    posList.add(new BlockPos(x2, y2, z2));
+                }
+            }
+        }
+
+        // Search for blocks within the list
+        for (BlockPos pos : posList) {
+            // Get the block at the current position
+            BlockState state = level.getBlockState(pos);
+            Block block = state.getBlock();
+
+            // If the block is a target block
+            if (targetBlocks.contains(block)) {
+                // Calculate the distance between the entity and the block
+                double distance = Math.sqrt(Math.pow(pos.getX() - entityPos.getX(), 2) +
+                        Math.pow(pos.getY() - entityPos.getY(), 2) +
+                        Math.pow(pos.getZ() - entityPos.getZ(), 2));
+
+                // If the distance is smaller than the current minimum distance
+                if (distance < minDistance) {
+                    // Update the minimum distance and nearest block position
+                    minDistance = distance;
+                    nearestPos = pos;
+                }
+            }
+        }
+
+        // Return the nearest block position
+        return nearestPos;
+    }
+    @Override
+    public void tick()
+    {
+        super.tick();
+
+        // Get the entity's current position
+        double x = this.getX();
+        double y = this.getY();
+        double z = this.getZ();
+        BlockPos entityPos = new BlockPos(x, y, z);
+
+        // If the target block has not been set or has been destroyed
+        if (targetPos == null || this.getLevel().getBlockState(targetPos).isAir())
+        {
+            // Find the nearest redstone block or red wool block
+            targetPos = findNearestBlock(entityPos, Blocks.REDSTONE_BLOCK, Blocks.RED_WOOL, Blocks.RED_BANNER);
+
+            // If a target block was found
+            if (targetPos != null)
+            {
+                // Calculate the direction to the target block
+                direction = targetPos.subtract(entityPos);
+            }
+        }
+
+        // If a target block is set
+        if (targetPos != null)
+        {
+            // Set the entity's motion
+            this.setDeltaMovement(direction.getX(), direction.getY(), direction.getZ());
+
+            // If the entity is close enough to the target block
+            if (this.distanceToSqr(Vec3.atCenterOf(targetPos)) <= 2.0)
+            {
+                // Break the block
+                this.getLevel().destroyBlock(targetPos, true);
+
+                // Clear the target block
+                targetPos = null;
+                direction = null;
+            }
+        }
+    }
+
 
 }
 
